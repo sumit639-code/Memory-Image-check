@@ -1,3 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Playpen+Sans:wght@100..800&display=swap');
+
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,8 +13,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #FEDFC2;
+    --foreground: #000000;
   }
 }
 

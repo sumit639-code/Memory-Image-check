@@ -11,6 +11,10 @@ module.exports = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        lucky: ["Luckiest Guy", "sans-serif"],
+        play: ["Playpen Sans", "monospace"],
+      },
     },
   },
   plugins: [],
