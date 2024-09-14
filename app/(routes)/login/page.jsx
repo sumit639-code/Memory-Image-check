@@ -4,7 +4,7 @@ import { useRecoilState } from "recoil";
 import { useRouter } from "next/navigation";
 import { userState } from "@/app/context/gameAtoms"; // Adjust the path as necessary
 
-const url = "http://localhost:8080/user/login";
+const url = "https://memory-image-server-production.up.railway.app/user/login";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -79,7 +79,9 @@ const Login = () => {
   return (
     <div className="flex justify-center items-center h-screen font-play bg-[#F8D5BB] p-4">
       <div className="bg-white p-8 rounded-xl shadow-md max-w-md w-full">
-        <h1 className="text-3xl sm:text-4xl text-[#4F91B1] font-lucky mb-4">MEMORY GAME</h1>
+        <h1 className="text-3xl sm:text-4xl text-[#4F91B1] font-lucky mb-4">
+          MEMORY GAME
+        </h1>
         <p className="text-base sm:text-lg mb-6">Login to Continue</p>
 
         <form className="space-y-4">
@@ -108,7 +110,10 @@ const Login = () => {
             {loading ? "Loading..." : "LOGIN"}
           </button>
         </form>
-        <div className="text-sm sm:text-base mt-4 text-center cursor-pointer" onClick={() => router.push("/register")}>
+        <div
+          className="text-sm sm:text-base mt-4 text-center cursor-pointer"
+          onClick={() => router.push("/register")}
+        >
           Register
         </div>
       </div>

@@ -82,7 +82,7 @@ const Page = () => {
 
       // Update the backend with the new high score
       try {
-        const response = await fetch("http://localhost:8080/game/updateScore", {
+        const response = await fetch("https://memory-image-server-production.up.railway.app/game/updateScore", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

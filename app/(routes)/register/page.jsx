@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useRecoilValue } from "recoil";
 import { userState } from "@/app/context/gameAtoms"; // Adjust the import path as needed
 
-const url = "http://localhost:8080/user/register"; // Adjust the URL as needed
+const url = "https://memory-image-server-production.up.railway.app/user/register"; // Adjust the URL as needed
 
 const Register = () => {
   const [username, setUsername] = useState("");

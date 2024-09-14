@@ -9,7 +9,7 @@ const Leaderboard = () => {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const response = await fetch('http://localhost:8080/game/leaderboard', {
+        const response = await fetch('https://memory-image-server-production.up.railway.app/game/leaderboard', {
           method: 'POST',
           credentials: 'include' // Ensure cookies are sent with the request
         });

@@ -39,14 +39,17 @@ const Page = () => {
   const resetScore = async () => {
     const score = 0;
     try {
-      const response = await fetch("http://localhost:8080/game/updateScore", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ score }),
-      });
+      const response = await fetch(
+        "https://memory-image-server-production.up.railway.app/game/updateScore",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ score }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to update high score");
@@ -65,7 +68,7 @@ const Page = () => {
     try {
       // Perform logout logic here (e.g., API call to invalidate session)
       const response = await axios.post(
-        "http://localhost:8080/user/logout",
+        "https://memory-image-server-production.up.railway.app/user/logout",
         {},
         {
           withCredentials: true,
@@ -97,13 +100,16 @@ const Page = () => {
   };
   const handleUser = async () => {
     try {
-      const response = await fetch("http://localhost:8080/user/getUser", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        "https://memory-image-server-production.up.railway.app/user/getUser",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const data = await response.json();
       console.log(data);
