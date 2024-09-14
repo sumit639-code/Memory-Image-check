@@ -1,35 +1,42 @@
 "use client";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import Confetti from "react-confetti";
+import { useRecoilState } from "recoil";
+import {
+  cardsState,
+  flippedCardsState,
+  matchedCardsState,
+  isAnimatingState,
+  loadingState,
+  scoreState,
+  highScoreState,
+  gameCompletedState,
+  showPopupState,
+  movesState,
+  userState,
+} from "@/app/context/gameAtoms";
 
 const Page = () => {
-  const [cards, setCards] = useState([]);
-  const [flippedCards, setFlippedCards] = useState([]);
-  const [matchedCards, setMatchedCards] = useState([]);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [score, setScore] = useState(0);
-  const [highScore, setHighScore] = useState(() => {
-    // Retrieve high score from localStorage or initialize to 0
-    const savedHighScore = localStorage.getItem("highScore");
-    return savedHighScore ? parseInt(savedHighScore, 10) : 0;
-  });
-  const [gameCompleted, setGameCompleted] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
-  const [moves, setMoves] = useState(20);
+  const [cards, setCards] = useRecoilState(cardsState);
+  const [flippedCards, setFlippedCards] = useRecoilState(flippedCardsState);
+  const [matchedCards, setMatchedCards] = useRecoilState(matchedCardsState);
+  const [isAnimating, setIsAnimating] = useRecoilState(isAnimatingState);
+  const [loading, setLoading] = useRecoilState(loadingState);
+  const [score, setScore] = useRecoilState(scoreState);
+  const [highScore, setHighScore] = useRecoilState(highScoreState);
+  const [gameCompleted, setGameCompleted] = useRecoilState(gameCompletedState);
+  const [showPopup, setShowPopup] = useRecoilState(showPopupState);
+  const [moves, setMoves] = useRecoilState(movesState);
+  const [user, setUser] = useRecoilState(userState);
   const router = useRouter();
 
   useEffect(() => {
-    setCards(generateCards());
-  }, []);
-
-  useEffect(() => {
-    if (flippedCards.length === 2) {
-      setTimeout(checkForMatch, 400); // Delay before checking for matches
+    if (!user || !user.accessToken) {
+      router.push("/login");
     }
-  }, [flippedCards]);
+  }, [user, router]);
 
   useEffect(() => {
     if (matchedCards.length === cards.length && matchedCards.length > 0) {
@@ -37,7 +44,8 @@ const Page = () => {
     } else if (moves <= 0) {
       handleGameCompletion();
     }
-  }, [matchedCards, moves]);
+  }, [matchedCards, moves, cards.length]);
+  // console.log(highScore);
 
   const handleFlip = (index) => {
     if (
@@ -60,13 +68,37 @@ const Page = () => {
       setScore((prev) => prev + 10);
     }
     setTimeout(() => setFlippedCards([]), 600);
-  }, [flippedCards, cards]);
+  }, [flippedCards, cards, setFlippedCards, setMatchedCards, setScore]);
 
-  const handleGameCompletion = () => {
+  const handleGameCompletion = async () => {
     setGameCompleted(true);
+    console.log(score, highScore);
+
     if (score > highScore) {
+      console.log("working");
+
       setHighScore(score);
       localStorage.setItem("highScore", score);
+
+      // Update the backend with the new high score
+      try {
+        const response = await fetch("http://localhost:8080/game/updateScore", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ score }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to update high score");
+        }
+
+        await getScore(); // Ensure getScore is awaited
+      } catch (error) {
+        console.error("Error updating high score:", error);
+      }
     }
     setShowPopup(true);
   };
@@ -92,15 +124,59 @@ const Page = () => {
     setLoading(false);
   };
 
-  const handlehome = () => {
+  const handleHome = () => {
     router.push("/");
+  };
+
+  useEffect(() => {
+    setCards(generateCards());
+  }, [setCards]);
+
+  useEffect(() => {
+    if (flippedCards.length === 2) {
+      setTimeout(checkForMatch, 400); // Delay before checking for matches
+    }
+  }, [flippedCards, checkForMatch]);
+
+  const getScore = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/game/getScore", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to get user score");
+      }
+
+      const data = await response.json();
+      const userScore = data.score;
+
+      // Update high score if the user's score is higher
+      if (userScore > highScore) {
+        setHighScore(userScore);
+        localStorage.setItem("highScore", userScore);
+      }
+
+      // Update the user's score in the state
+      setUser((prevUser) => ({
+        ...prevUser,
+        score: userScore,
+      }));
+      console.log(user);
+    } catch (error) {
+      console.error("Error fetching user score:", error);
+    }
   };
 
   return (
     <div className="flex justify-center items-center flex-col p-5">
       {gameCompleted && <Confetti />}
       <div
-        onClick={handlehome}
+        onClick={handleHome}
         className="font-lucky bg-[#5996C0] cursor-pointer text-white text-4xl w-fit px-3 rounded-md"
       >
         Memory GAME
@@ -179,7 +255,10 @@ const Page = () => {
               className="mt-4 px-4 py-2 bg-[#5996C0] text-white rounded"
               onClick={() => {
                 setShowPopup(false);
-                setGameCompleted(false); // Fixed typo here
+                setGameCompleted(false);
+                setCards(generateCards()); // Reset cards for a new game
+                setScore(0); // Reset score for a new game
+                setMoves(20); // Reset moves for a new game
               }}
             >
               Close
